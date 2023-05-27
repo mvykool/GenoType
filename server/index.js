@@ -76,6 +76,26 @@ app.delete("/books/:id", (req, res) => {
     });
 });
 
+
+//update items from database
+
+app.put("/books/:id", (req, res) => {
+    const bookId = req.params.id;
+    const q = "UPDATE books SET `title` = ?, `desc` = ?, `price` = ?, `cover` = ? WHERE	id = ?";
+
+    const values = [
+        req.body.title,
+        req.body.desc,
+        req.body.price,
+        req.body.cover,
+    ]
+
+    db.query(q, [...values, bookId], (err, data) => {
+        if (err) return res.json(err)
+        return res.json("book's been updated successfully");
+    });
+});
+
 //run server in port 8800
 app.listen(8800, () => {
     console.log("Connected to server")
