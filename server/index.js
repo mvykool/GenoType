@@ -62,6 +62,20 @@ app.post("/books", (req, res) => {
     });
 });
 
+//delete items from database
+
+app.delete("/books/:id", (req, res) => {
+    const bookId = req.params.id;
+
+    //create query
+    const q = "DELETE FROM books WHERE id = ?";
+
+    db.query(q, [bookId], (err, data) => {
+        if (err) return res.json(err)
+        return res.json("book's been deleted successfully");
+    });
+});
+
 //run server in port 8800
 app.listen(8800, () => {
     console.log("Connected to server")

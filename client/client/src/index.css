@@ -11,3 +11,54 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
 }
+
+
+/* home/books page*/
+
+.app {
+    width: 80vw;
+    padding: 50px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: #343434;
+    margin: 0 auto;
+}
+
+.book-list {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.book-title,
+.book-list-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.book-list-button {
+    background: red;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.link {
+    text-decoration: none;
+    color: white;
+}
+
+.delete {
+    background: red;
+    cursor: pointer;
+}
+
+.update {
+    background: green;
+    cursor: pointer;
+}
