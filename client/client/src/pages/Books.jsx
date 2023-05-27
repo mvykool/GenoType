@@ -1,8 +1,39 @@
-import React from 'react'
+import {useState, useEffect}from 'react'
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Books = () => {
+
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    //make call to the server
+    const fetchAllBooks = async () => {
+      try{
+        const res = await axios.get("http://localhost:8800/books")
+        setBooks(res.data)
+      }catch(err){
+        console.log(err);
+      }
+    }
+
+    fetchAllBooks()
+  }, [])
+  
+
   return (
-	<div>Books</div>
+	<div>
+    <h1>paper shop</h1>
+    {books.map(book => (
+      <div key={book.id}>
+        {book.cover && <img src={book.cover} alt={book.title} />}
+        <h2>{book.title}</h2>
+        <p>{book.desc}</p>
+        <span>{book.price}</span>
+        <button><Link to="/add">Add new book</Link></button>
+      </div>
+    ))}
+  </div>
   )
 }
 

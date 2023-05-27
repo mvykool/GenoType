@@ -1,5 +1,6 @@
 import express from "express";
 import mysql from "mysql2";
+import cors from "cors";
 
 //create app
 const app = express();
@@ -15,6 +16,9 @@ const db = mysql.createConnection({
 //middleware to allow clinet send JSOn
 
 app.use(express.json());
+
+//run cors to allow client to access
+app.use(cors());
 
 
 //connect to backend in browser
@@ -42,11 +46,12 @@ app.get('/books', (req, res) => {
 app.post("/books", (req, res) => {
 
     //create query
-    const q = "INSERT INTO books (`title`, `desc`, `cover`) VALUES (?)"
+    const q = "INSERT INTO books (`title`, `desc`, `price`, `cover`) VALUES (?)"
 
     const values = [
         req.body.title,
         req.body.desc,
+        req.body.price,
         req.body.cover,
     ];
 
