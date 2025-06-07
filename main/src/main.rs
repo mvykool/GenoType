@@ -43,4 +43,30 @@ fn main() {
 
     //this is our tokenized version of Rust file ready to process
     let input_syntax: syn::File = syn::parse_file(&input_file_text).expect("unable to parse file");
+
+
+    //this string will store the output of the typescript file that we will
+    //continously append to as we process the Rust file
+    let mut output_text = String::new();
+
+    for item in input_syntax.items.iter() {
+        match time {
+            //this 'item type' enum variant matches our type alias
+            syn::Item::Type(item_type) => {
+                let type_text = parse_item_type(item_type);
+                output_text.push_str(&type_text);
+            }
+            _ => {
+                dbg!("encountered an unimplemented type");
+            }
+        }
+    }
+
+    let mut output_file = File::create(output_filename).unwrap();
+
+    write!(output_file, "{}", output_text).expect("failed to write to output file");
+}
+
+fn parse_item_type(item_type: &syn::ItemType) -> String {
+    String::from("todo")
 }
