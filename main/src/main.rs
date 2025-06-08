@@ -68,5 +68,17 @@ fn main() {
 }
 
 fn parse_item_type(item_type: &syn::ItemType) -> String {
-    String::from("todo")
+    let mut output_text = String::new();
+
+    output_text.push_str("export type");
+
+    // 'indent' is the name of the type alias
+    output_text.push_str(&item_type.ident.to_string());
+    output_text.push_str(" = ");
+
+    let type_string = parse_type(&item_type.ty);
+    output_text.push_str(&type_string);
+    output_text.push_str(";");
+
+    output_text
 }
