@@ -12,3 +12,9 @@ struct Person {
     age: u32,
     enjoys_coffe: bool,
 }
+
+struct ComplexType {
+    colour_map: HashMap<String, Colour>,
+    list_of_names: Vec<String>,
+    optional_person: Option<Person>,
+}

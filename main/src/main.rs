@@ -48,6 +48,7 @@ fn main() {
     //this string will store the output of the typescript file that we will
     //continously append to as we process the Rust file
     let mut output_text = String::new();
+    output_text.push_str(&create_initial_types());
 
     for item in input_syntax.items.iter() {
         match item {
@@ -112,12 +113,35 @@ fn parse_type(syn_type: &syn::Type) -> String {
                 // a simple type like i32 matches here as it
                 // does not include any arguments
                 syn::PathArguments::None => {}
+
+                syn::PathArguments::AngleBracketed(generic_args) => {
+                    output_text.push('<');
+                    for (i, arg) in generic_args.args.iter().enumerate() {
+                        if let syn::GenericArgument::Type(inner_type) = arg {
+                            output_text.push_str(&parse_type(inner_type));
+                            if i < generic_args.args.len() - 1 {
+                                output_text.push_str(", ");
+                            }
+                        } else {
+                            dbg!("Unsupported generic argument");
+                        }
+                    }
+                    output_text.push('>');
+                }
+
                 _ => {
                     dbg!("encountered an unimplemented token");
                 }
             }
         }
-
+        syn::Type::Tuple(type_tuple) => {
+            output_text.push_str("[");
+            for elem in type_tuple.elems.iter() {
+                output_text.push_str(&parse_type(elem));
+                output_text.push_str(",");
+            }
+            output_text.push_str("]");
+        }
         _ => {
             dbg!("encountered an unimplemented token");
         }
@@ -240,6 +264,20 @@ fn parse_item_struct(item_struct: &syn::ItemStruct) -> String {
     }
     output_text.push_str("}");
     output_text.push_str(";");
+
+    output_text
+}
+
+//initialize some typescript equivalent of 
+//core Rust types like result option, etc
+fn create_initial_types() -> String {
+    let mut output_text = String::new();
+
+    output_text.push_str("type HashSet<T extends number | string> = Record<T, undefined>;");
+    output_text.push_str("type HashMap<T extends number | string, U> = Record<T, U>;");
+    output_text.push_str("type Vec<T> = Array<T>;");
+    output_text.push_str("type Option<T> = T | undefined;");
+    output_text.push_str("type Result<T, U> = T | U;");
 
     output_text
 }
