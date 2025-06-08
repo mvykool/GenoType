@@ -1,4 +1,9 @@
 use clap::{Arg, Command};
+use std::{
+    fs::File,
+    io::{Read, Write},
+    path::Path,
+};
 
 fn main() {
     let matches = Command::new("GenoType")
@@ -26,4 +31,16 @@ fn main() {
 
     dbg!(input_filename);
     dbg!(output_filename);
+
+    let input_path = Path::new(input_file);
+
+    let mut input_file =
+        File::open(input_path).expect(&format!("Unable to open file {}", input_path.display()));
+
+    let mut input_file_text = String::new();
+
+    input_file.read_to_string(&mut input_file_text).expect("unable to read file");
+
+    //this is our tokenized version of Rust file ready to process
+    let input_syntax: syn::File = syn::parse_file(&input_file_text).expect("unable to parse file");
 }
