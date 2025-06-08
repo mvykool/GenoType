@@ -82,3 +82,36 @@ fn parse_item_type(item_type: &syn::ItemType) -> String {
 
     output_text
 }
+
+fn parse_type(syn_type: &syn::Type) -> String {
+    let mut output_text = String::new();
+
+    match syn_type {
+        //primitive types like i32 will match path
+        //we curretnly do not do anything with full paths
+        //so we take only the last() segment aka the type name
+        syn::Type::Path(type_path) => {
+            let segment = type_path.path.segments.last().unwrap();
+
+            let field_type = segment.ident.to_string();
+
+            let ts_field_type = parse_type_ident(&field_type).to_owned();
+            output_text.push_str(&ts_field_type);
+
+            match &segment.arguments {
+                // a simple type like i32 matches here as it
+                // does not include any arguments
+                syn::PathArguments::None => {}
+                _ => {
+                    dbg!("encountered an unimplemented token");
+                }
+            }
+        }
+
+        _ => {
+            dbg!("encountered an unimplemented token");
+        }
+    };
+
+    output_text
+}
