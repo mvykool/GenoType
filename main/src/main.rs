@@ -12,14 +12,14 @@ fn main() {
         .about("convert rust types to TS")
         .arg(
             Arg::new("input")
-                .short("i")
+                .short('i')
                 .long("input")
                 .required(true)
                 .help("the rust file to process"),
         )
         .arg(
-            Arg::new("output") 
-                .short("o")
+            Arg::new("output")
+                .short('o')
                 .long("output")
                 .required(true)
                 .help("the name of the TS file to output"),
@@ -32,7 +32,7 @@ fn main() {
     dbg!(input_filename);
     dbg!(output_filename);
 
-    let input_path = Path::new(input_file);
+    let input_path = Path::new(input_filename);
 
     let mut input_file =
         File::open(input_path).expect(&format!("Unable to open file {}", input_path.display()));
@@ -50,7 +50,7 @@ fn main() {
     let mut output_text = String::new();
 
     for item in input_syntax.items.iter() {
-        match time {
+        match item {
             //this 'item type' enum variant matches our type alias
             syn::Item::Type(item_type) => {
                 let type_text = parse_item_type(item_type);
