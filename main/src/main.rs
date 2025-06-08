@@ -56,6 +56,11 @@ fn main() {
                 let type_text = parse_item_type(item_type);
                 output_text.push_str(&type_text);
             }
+            // enum variants
+            syn::Item::Type(item_enum) => {
+                let enum_text = parse_item_type(item_enum);
+                output_text.push_str(&enum_text);
+            }
             _ => {
                 dbg!("encountered an unimplemented type");
             }
@@ -123,4 +128,64 @@ fn parse_type_ident(ident: &str) -> &str {
         "str" | "String" | "char" => "string",
         _=> ident,
     }
+}
+
+fn parse_item_enum(item_enum: &syn::ItemEnum) -> String {
+    let mut output_text = String::new();
+
+    output_text.push_str("export type");
+    output_text.push_str(" ");
+
+    let enum_name = item_enum.ident.to_string();
+    output_text.push_str(" ");
+    output_text.push_str("=");
+    output_text.push_str(" ");
+
+    for variant in item_enum.variants.iter() {
+        // use the pipe character for union types
+        // typescript also allows it before the first type as valid syntax
+        output_text.push_str(" | {");
+        output_text.push_str(" ");
+
+        //for simplicity this implementation we are using assumes that enum will be
+        //using serfe's adjacently tagged attribute
+        //serde tag = "t", content = "c"
+        //as an improvement on this implementation you could parse the attribute
+        //and habdle the enum differently depending on which attribute the user chose
+        output_text.push_str("t: \"");
+        let variant_name = variant.ident.to_string();
+        output_text.push_str(&variant_name);
+        output_text.push_str("\" , c: ");
+
+        match &variant.fields {
+            syn::Fields::Named(named_fields) => {
+                output_text.push_str("{");
+                for field in named_fields.named.iter() {
+                    if let Some(ident) = &field.ident {
+                        output_text.push_str(&ident.to_string());
+                        output_text.push_str(":");
+
+                        let field_type = parse_type(&field.ty);
+                        output_text.push_str(&field_type);
+                        output_text.push_str(";");
+                    }
+                }
+                outout_text.push_str("}");
+            }
+            syn::Fields::Unnamed(unnamed_fields) => {
+                //currently only support a single unnamed field
+                let unnamed_field = unnamed_fields.unnamed.first().unwrap();
+                let field_type = parse_type(&unnamed_field.ty);
+                output_text.push_str(&field_type);
+            }
+            syn::Fields::Unit => {
+                output_text.push_str("undefined");
+            }
+        }
+
+        output_text.push_str("}");
+    }
+    output_text.push_str(";");
+
+    output_text
 }
