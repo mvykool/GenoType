@@ -56,9 +56,9 @@ fn main() {
                 let type_text = parse_item_type(item_type);
                 output_text.push_str(&type_text);
             }
-            // enum variants
-            syn::Item::Type(item_enum) => {
-                let enum_text = parse_item_type(item_enum);
+            // parse enums
+            syn::Item::Enum(item_enum) => {
+                let enum_text = parse_item_enum(item_enum);
                 output_text.push_str(&enum_text);
             }
             _ => {
@@ -75,7 +75,7 @@ fn main() {
 fn parse_item_type(item_type: &syn::ItemType) -> String {
     let mut output_text = String::new();
 
-    output_text.push_str("export type");
+    output_text.push_str("export type ");
 
     // 'indent' is the name of the type alias
     output_text.push_str(&item_type.ident.to_string());
@@ -137,6 +137,7 @@ fn parse_item_enum(item_enum: &syn::ItemEnum) -> String {
     output_text.push_str(" ");
 
     let enum_name = item_enum.ident.to_string();
+    output_text.push_str(&enum_name);
     output_text.push_str(" ");
     output_text.push_str("=");
     output_text.push_str(" ");
@@ -170,7 +171,7 @@ fn parse_item_enum(item_enum: &syn::ItemEnum) -> String {
                         output_text.push_str(";");
                     }
                 }
-                outout_text.push_str("}");
+                output_text.push_str("}");
             }
             syn::Fields::Unnamed(unnamed_fields) => {
                 //currently only support a single unnamed field
