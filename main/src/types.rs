@@ -6,3 +6,9 @@ enum Colour {
     Green(i32),
     Blue(i32),
 }
+
+struct Person {
+    name: String,
+    age: u32,
+    enjoys_coffe: bool,
+}

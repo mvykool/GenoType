@@ -61,6 +61,11 @@ fn main() {
                 let enum_text = parse_item_enum(item_enum);
                 output_text.push_str(&enum_text);
             }
+            // adding structs support
+            syn::Item::Struct(item_struct) => {
+                let struct_text = parse_item_struct(item_struct);
+                output_text.push_str(&struct_text);
+            }
             _ => {
                 dbg!("encountered an unimplemented type");
             }
@@ -126,6 +131,7 @@ fn parse_type_ident(ident: &str) -> &str {
         "i8" | "i16" | "i32" | "i64" | "i128" | "u8" | "u16" | "u32" | "u64" | "f32" | "f64"
         | "isize" | "usize" => "number",
         "str" | "String" | "char" => "string",
+        "bool" => "boolean",
         _=> ident,
     }
 }
@@ -186,6 +192,53 @@ fn parse_item_enum(item_enum: &syn::ItemEnum) -> String {
 
         output_text.push_str("}");
     }
+    output_text.push_str(";");
+
+    output_text
+}
+
+fn parse_item_struct(item_struct: &syn::ItemStruct) -> String {
+    let mut output_text = String::new();
+
+    let struct_name = item_struct.ident.to_string();
+    output_text.push_str("export interface");
+    output_text.push_str(" ");
+    output_text.push_str(&struct_name);
+    output_text.push_str(" ");
+    output_text.push_str("{");
+
+    match &item_struct.fields {
+        syn::Fields::Named(named_fields) => {
+            for named_field in named_fields.named.iter() {
+                match &named_field.ident {
+                    Some(ident) => {
+                        let field_name = ident.to_string();
+                        output_text.push_str(&field_name);
+                        output_text.push_str(":");
+                    }
+                    None => todo!(),
+                }
+                let field_type = parse_type(&named_field.ty);
+                output_text.push_str(&field_type);
+                output_text.push_str(";");
+            }
+        }
+        // for tuple structs we will serialize them as interfaces with
+        // fields named for the numerical index to align with serde
+        // default handling of this type
+        syn::Fields::Unnamed(fields) => {
+            // example struct somthing (i32, Anything);
+            // output: export interface Somthing { 0: i32, 1: anything}
+            for (index, field) in fields.unnamed.iter().enumerate() {
+                output_text.push_str(&index.to_string());
+                output_text.push_str(":");
+                output_text.push_str(&parse_type(&field.ty));
+                output_text.push_str(";");
+            }
+        }
+        syn::Fields::Unit => (),
+    }
+    output_text.push_str("}");
     output_text.push_str(";");
 
     output_text
