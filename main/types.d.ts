@@ -1,2 +1,1 @@
-todo;
-
+export typeNumberAlias = number;
