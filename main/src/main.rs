@@ -115,3 +115,12 @@ fn parse_type(syn_type: &syn::Type) -> String {
 
     output_text
 }
+
+fn parse_type_ident(ident: &str) -> &str {
+    match ident {
+        "i8" | "i16" | "i32" | "i64" | "i128" | "u8" | "u16" | "u32" | "u64" | "f32" | "f64"
+        | "isize" | "usize" => "number",
+        "str" | "String" | "char" => "string",
+        _=> ident,
+    }
+}
